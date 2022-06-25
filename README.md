@@ -1,8 +1,7 @@
 
 # Multivariate Time Series Forecasting using  Forecasting with Graph Neural Networks and Lasso Ridge regression
 
-A brief description of what this project does and who it's for
-
+Multivariate time series forecasting(MLTS) has been a mainstream tool for  forecasting in economics, traffic modelling, economics, future shipments, temperature forecasts(temperature forecast solely on previous year data(as shown in "Lugano temperature forecast", it requires weather modelling too). The basic assumption in multivariate time series forecasting is that different variables are dependent on each other, but existing methods are not very efficient at finding a good neighbourhood relationship. It can be said that they fail at fully exploiting the spatial dependencies between the multiple features of a time series. Change in a single variable directly or indirectly leads to change in the other variables, for eg. change in temperature would directly effect the electricity consumption of a given area  It can indirectly affect the stock price of a certain company. Using MLTS we can capture the trends and overall changes seen with dynamically changes variables. In this work we conduct a study between Graph Neural networks with (Ridge and Lasso) Regression to understand the kind of results we obtain from Machine learning models and classical statistical method. In the present methods based on statistics, such as Gaussian process models and auto regressive models assume linear dependency among variables. 
 
 ## Documentation
 
