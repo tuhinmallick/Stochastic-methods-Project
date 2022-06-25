@@ -22,7 +22,7 @@ temp_2 = all_var(:,2)';
 temp_3=all_var(:,3)';
 
 T=length(temp_3);
-temp=temp_3;
+temp=temp_2;
 %% Plot 
 
 %bar(all_var(:,1))
@@ -78,18 +78,22 @@ for p=0:P
 end
 
  Y=temp';
- 
+ actual_y2=Y;
+  %%
+ %finding for a NAN value
+ TF=isnan(Y)
+ Y(TF)= 1.5
 %%
 % Solving the original (not regularized) regression problem
 
 min(eig(cov(X)));
-Beta_3=ComputeBeta(X,Y);
-figure;plot(Beta_3,'k-o','LineWidth',2,'MarkerSize',12);set(gca,'XTick',1:length(Names),'XTickLabel',Names)
+Beta_2=ComputeBeta(X,Y);
+figure;plot(Beta_2,'k-o','LineWidth',2,'MarkerSize',12);set(gca,'XTick',1:length(Names),'XTickLabel',Names)
 title('Global Voltage ')
 ylabel('Parameter Values','FontSize',16);
 set(gca,'XScale','log','LineWidth',2,'FontSize',16)
 axis tight
-Y_ML=Beta_3'*X';
+Y_ML_2=Beta_2'*X';
 %%
 % Demonstrate the problem with predictions for D days
 D=3000;
@@ -99,7 +103,7 @@ for p=0:P
 end
 title('Global Reactive power')
 ff=figure;plot(Y,':.','LineWidth',0.5);hold on;
-plot(Beta_3'*X_pred','m.-','LineWidth',2);
+plot(Beta_2'*X_pred','m.-','LineWidth',2);
 
 
 %%
@@ -109,10 +113,10 @@ alpha=[1e-5 1e-4 1e-3 5e-3 1e-2 5e-2 1e-1 5e-1 1 2 4 8 16 32 64 128 ];
 figure;hold on;
 tic;
 for i=1:length(alpha)
-    BetaReg_3(:,i)=ComputeBetaRegularized(X,Y,alpha(i));
-    Y_MLReg(i,:)=BetaReg_3(:,i)'*X';
+    BetaReg_2(:,i)=ComputeBetaRegularized(X,Y,alpha(i));
+    Y_MLReg(i,:)=BetaReg_2(:,i)'*X';
     ErrorNorm(i)=(Y'-Y_MLReg(i,:))*(Y'-Y_MLReg(i,:))';
-    SolutionNorm(i)=BetaReg_3(:,i)'*BetaReg_3(:,i);
+    SolutionNorm(i)=BetaReg_2(:,i)'*BetaReg_2(:,i);
     plot(SolutionNorm(i),ErrorNorm(i),'o','LineWidth',2);
     title('Beta values')
     text(SolutionNorm(i)+1,ErrorNorm(i)-1,['\alpha=' num2str(alpha(i))],'FontSize',12);
@@ -127,7 +131,7 @@ axis tight
 %%
 % Visualize Parameters and identified trend
 i=11;
-gg=figure;plot(0*BetaReg_3(:,i),'k:','LineWidth',2);hold on;plot(BetaReg_3(:,i),'r-o','LineWidth',2,'MarkerSize',12);set(gca,'XTick',1:length(Names),'XTickLabel',Names)
+gg=figure;plot(0*BetaReg_2(:,i),'k:','LineWidth',2);hold on;plot(BetaReg_2(:,i),'r-o','LineWidth',2,'MarkerSize',12);set(gca,'XTick',1:length(Names),'XTickLabel',Names)
 
 
 %%
@@ -137,7 +141,7 @@ for p=0:P
    X_pred(:,p+1)=(1/(T^(p))).*[1:T+D]'.^(p); 
 end
 figure(ff);
-plot(BetaReg_3(:,i)'*X_pred','r.-','LineWidth',2);
+plot(BetaReg_2(:,i)'*X_pred','r.-','LineWidth',2);
 
 %%
 % Solve l1-regularized problem (lasso regression) 
@@ -184,9 +188,6 @@ end
 title('Global Reactive power')
 ff=figure;plot(Y,':.','LineWidth',0.5);hold on;
 plot(final_beta'*X_pred','m.-','LineWidth',2);
-
-%%
-C= cov(Beta) 
 
 %%
 %making subplots using images
@@ -239,5 +240,13 @@ copyobj(allchild(get(c3,'CurrentAxes')),h(3));
 l(1)=legend(h(1),'Beta Values P =10')
 l(2)=legend(h(2),'Beta Values P =40')
 
-%%
-rse= 
+%% Calculating RSE
+
+real_value=actual_y1;%[actual_y1 actual_y2 actual_y3];
+predicted_values=Y_ML_1';%[Y_ML_1' Y_ML_2' Y_ML_3'];
+err= predicted_values-real_value;
+err=err/predicted_values;
+% Then "square" the "error".
+squareError = err.^2;
+meanSquareError = mean(squareError); 
+rootMeanSquareError = sqrt(meanSquareError);
