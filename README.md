@@ -1,34 +1,59 @@
-# dvc-project-template
-DVC project template
 
-## STEPS -
+# Multivariate Time Series Forecasting using  Forecasting with Graph Neural Networks and Lasso Ridge regression
 
-### STEP 01- Create a repository by using template repository
+A brief description of what this project does and who it's for
 
-### STEP 02- Clone the new repository
 
-### STEP 03- Create a conda environment after opening the repository in VSCODE
+## Documentation
+
+[Documentation](https://linktodocumentation)
+
+
+## Run Locally
+
+Clone the project
 
 ```bash
-conda create --prefix ./env python=3.7 -y
+  git clone https://link-to-project
 ```
 
+Go to the project directory
+
 ```bash
-conda activate ./env
-```
-OR
-```bash
-source activate ./env
+  cd my-project
 ```
 
-### STEP 04- install the requirements
+Install dependencies
+
 ```bash
-pip install -r requirements.txt
+  npm install
 ```
 
-### STEP 05- initialize the dvc project
+Start the server
+
 ```bash
-dvc init
+  npm run start
 ```
 
-### STEP 06- commit and push the changes to the remote repository
+
+## Screenshots
+
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
+
+## Authors
+
+- [@katherinepeterson](https://www.github.com/octokatherine)
+
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
+
+
+## Acknowledgements
+
+ - [Awesome Readme Templates](https://awesomeopensource.com/project/elangosundar/awesome-README-templates)
+ - [Awesome README](https://github.com/matiassingers/awesome-readme)
+ - [How to write a Good readme](https://bulldogjob.com/news/449-how-to-write-a-good-readme-for-your-github-project)
+
