@@ -42,7 +42,7 @@ Start the server
 
 ## Authors
 
-- [@katherinepeterson](https://www.github.com/octokatherine)
+- [@tuhinmallick](https://www.github.com/tuhinmallick)
 
 
 ## License
