@@ -71,10 +71,7 @@ class DataLoaderS(object):
 
     def get_batches(self, inputs, targets, batch_size, shuffle=True):
         length = len(inputs)
-        if shuffle:
-            index = torch.randperm(length)
-        else:
-            index = torch.LongTensor(range(length))
+        index = torch.randperm(length) if shuffle else torch.LongTensor(range(length))
         start_idx = 0
         while (start_idx < length):
             end_idx = min(length, start_idx + batch_size)
@@ -169,8 +166,10 @@ def calculate_normalized_laplacian(adj):
     d_inv_sqrt = np.power(d, -0.5).flatten()
     d_inv_sqrt[np.isinf(d_inv_sqrt)] = 0.
     d_mat_inv_sqrt = sp.diags(d_inv_sqrt)
-    normalized_laplacian = sp.eye(adj.shape[0]) - adj.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt).tocoo()
-    return normalized_laplacian
+    return (
+        sp.eye(adj.shape[0])
+        - adj.dot(d_mat_inv_sqrt).transpose().dot(d_mat_inv_sqrt).tocoo()
+    )
 
 def calculate_scaled_laplacian(adj_mx, lambda_max=2, undirected=True):
     if undirected:
@@ -206,13 +205,13 @@ def load_adj(pkl_filename):
 def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_size=None):
     data = {}
     for category in ['train', 'val', 'test']:
-        cat_data = np.load(os.path.join(dataset_dir, category + '.npz'))
-        data['x_' + category] = cat_data['x']
-        data['y_' + category] = cat_data['y']
+        cat_data = np.load(os.path.join(dataset_dir, f'{category}.npz'))
+        data[f'x_{category}'] = cat_data['x']
+        data[f'y_{category}'] = cat_data['y']
     scaler = StandardScaler(mean=data['x_train'][..., 0].mean(), std=data['x_train'][..., 0].std())
     # Data format
     for category in ['train', 'val', 'test']:
-        data['x_' + category][..., 0] = scaler.transform(data['x_' + category][..., 0])
+        data[f'x_{category}'][..., 0] = scaler.transform(data[f'x_{category}'][..., 0])
 
     data['train_loader'] = DataLoaderM(data['x_train'], data['y_train'], batch_size)
     data['val_loader'] = DataLoaderM(data['x_val'], data['y_val'], valid_batch_size)
@@ -223,10 +222,7 @@ def load_dataset(dataset_dir, batch_size, valid_batch_size= None, test_batch_siz
 
 
 def masked_mse(preds, labels, null_val=np.nan):
-    if np.isnan(null_val):
-        mask = ~torch.isnan(labels)
-    else:
-        mask = (labels!=null_val)
+    mask = ~torch.isnan(labels) if np.isnan(null_val) else (labels!=null_val)
     mask = mask.float()
     mask /= torch.mean((mask))
     mask = torch.where(torch.isnan(mask), torch.zeros_like(mask), mask)
@@ -240,10 +236,7 @@ def masked_rmse(preds, labels, null_val=np.nan):
 
 
 def masked_mae(preds, labels, null_val=np.nan):
-    if np.isnan(null_val):
-        mask = ~torch.isnan(labels)
-    else:
-        mask = (labels!=null_val)
+    mask = ~torch.isnan(labels) if np.isnan(null_val) else (labels!=null_val)
     mask = mask.float()
     mask /=  torch.mean((mask))
     mask = torch.where(torch.isnan(mask), torch.zeros_like(mask), mask)
@@ -253,10 +246,7 @@ def masked_mae(preds, labels, null_val=np.nan):
     return torch.mean(loss)
 
 def masked_mape(preds, labels, null_val=np.nan):
-    if np.isnan(null_val):
-        mask = ~torch.isnan(labels)
-    else:
-        mask = (labels!=null_val)
+    mask = ~torch.isnan(labels) if np.isnan(null_val) else (labels!=null_val)
     mask = mask.float()
     mask /=  torch.mean((mask))
     mask = torch.where(torch.isnan(mask), torch.zeros_like(mask), mask)
@@ -284,8 +274,7 @@ def load_node_feature(path):
     x = np.array(x)
     mean = np.mean(x,axis=0)
     std = np.std(x,axis=0)
-    z = torch.tensor((x-mean)/std,dtype=torch.float)
-    return z
+    return torch.tensor((x-mean)/std,dtype=torch.float)
 
 
 def normal_std(x):

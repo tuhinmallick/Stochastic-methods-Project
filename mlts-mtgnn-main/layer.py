@@ -46,10 +46,9 @@ class prop(nn.Module):
         h = x
         dv = d
         a = adj / dv.view(-1, 1)
-        for i in range(self.gdep):
+        for _ in range(self.gdep):
             h = self.alpha*x + (1-self.alpha)*self.nconv(h,a)
-        ho = self.mlp(h)
-        return ho
+        return self.mlp(h)
 
 
 class mixprop(nn.Module):
@@ -68,7 +67,7 @@ class mixprop(nn.Module):
         h = x
         out = [h]
         a = adj / d.view(-1, 1)
-        for i in range(self.gdep):
+        for _ in range(self.gdep):
             h = self.alpha*x + (1-self.alpha)*self.nconv(h,a)
             out.append(h)
         ho = torch.cat(out,dim=1)
@@ -100,7 +99,7 @@ class dy_mixprop(nn.Module):
 
         h = x
         out = [h]
-        for i in range(self.gdep):
+        for _ in range(self.gdep):
             h = self.alpha*x + (1-self.alpha)*self.nconv(h,adj0)
             out.append(h)
         ho = torch.cat(out,dim=1)
@@ -109,7 +108,7 @@ class dy_mixprop(nn.Module):
 
         h = x
         out = [h]
-        for i in range(self.gdep):
+        for _ in range(self.gdep):
             h = self.alpha * x + (1 - self.alpha) * self.nconv(h, adj1)
             out.append(h)
         ho = torch.cat(out, dim=1)
@@ -127,8 +126,7 @@ class dilated_1D(nn.Module):
         self.tconv = nn.Conv2d(cin,cout,(1,7),dilation=(1,dilation_factor))
 
     def forward(self,input):
-        x = self.tconv(input)
-        return x
+        return self.tconv(input)
 
 class dilated_inception(nn.Module):
     def __init__(self, cin, cout, dilation_factor=2):
@@ -140,9 +138,7 @@ class dilated_inception(nn.Module):
             self.tconv.append(nn.Conv2d(cin,cout,(1,kern),dilation=(1,dilation_factor)))
 
     def forward(self,input):
-        x = []
-        for i in range(len(self.kernel_set)):
-            x.append(self.tconv[i](input))
+        x = [self.tconv[i](input) for i in range(len(self.kernel_set))]
         for i in range(len(self.kernel_set)):
             x[i] = x[i][...,-x[-1].size(3):]
         x = torch.cat(x,dim=1)
@@ -201,8 +197,7 @@ class graph_constructor(nn.Module):
         nodevec2 = torch.tanh(self.alpha*self.lin2(nodevec2))
 
         a = torch.mm(nodevec1, nodevec2.transpose(1,0))-torch.mm(nodevec2, nodevec1.transpose(1,0))
-        adj = F.relu(torch.tanh(self.alpha*a))
-        return adj
+        return F.relu(torch.tanh(self.alpha*a))
 
 class graph_global(nn.Module):
     def __init__(self, nnodes, k, dim, device, alpha=3, static_feat=None):

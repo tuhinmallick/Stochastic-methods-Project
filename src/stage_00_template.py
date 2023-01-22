@@ -21,7 +21,6 @@ def main(config_path, params_path):
     ## read config files
     config = read_yaml(config_path)
     params = read_yaml(params_path)
-    pass
 
 
 if __name__ == '__main__':

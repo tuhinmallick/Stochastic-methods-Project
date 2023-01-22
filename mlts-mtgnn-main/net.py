@@ -97,10 +97,7 @@ class gtnet(nn.Module):
 
         if self.gcn_true:
             if self.buildA_true:
-                if idx is None:
-                    adp = self.gc(self.idx)
-                else:
-                    adp = self.gc(idx)
+                adp = self.gc(self.idx) if idx is None else self.gc(idx)
             else:
                 adp = self.predefined_A
 
@@ -123,11 +120,7 @@ class gtnet(nn.Module):
                 x = self.residual_convs[i](x)
 
             x = x + residual[:, :, :, -x.size(3):]
-            if idx is None:
-                x = self.norm[i](x,self.idx)
-            else:
-                x = self.norm[i](x,idx)
-
+            x = self.norm[i](x,self.idx) if idx is None else self.norm[i](x,idx)
         skip = self.skipE(x) + skip
         x = F.relu(skip)
         x = F.relu(self.end_conv_1(x))

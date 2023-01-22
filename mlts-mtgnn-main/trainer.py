@@ -67,7 +67,7 @@ class Optim(object):
         elif self.method == 'adam':
             self.optimizer = optim.Adam(self.params, lr=self.lr, weight_decay=self.lr_decay)
         else:
-            raise RuntimeError("Invalid optim method: " + self.method)
+            raise RuntimeError(f"Invalid optim method: {self.method}")
 
     def __init__(self, params, method, lr, clip, lr_decay=1, start_decay_at=None):
         self.params = params  # careful: params may be a generator
@@ -82,8 +82,6 @@ class Optim(object):
         self._makeOptimizer()
 
     def step(self):
-        # Compute gradients norm.
-        grad_norm = 0
         if self.clip is not None:
             torch.nn.utils.clip_grad_norm_(self.params, self.clip)
 
@@ -100,7 +98,7 @@ class Optim(object):
         #     if shrinkage < 1:
         #         param.grad.data.mul_(shrinkage)
         self.optimizer.step()
-        return  grad_norm
+        return 0
 
     # decay learning rate if val perf does not improve or we hit the start_decay_at limit
     def updateLearningRate(self, ppl, epoch):

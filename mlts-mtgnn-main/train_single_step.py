@@ -59,8 +59,7 @@ def train(data, X, Y, model, criterion, optim, batch_size):
     model.train()
     total_loss = 0
     n_samples = 0
-    iter = 0
-    for X, Y in data.get_batches(X, Y, batch_size, True):
+    for iter, (X, Y) in enumerate(data.get_batches(X, Y, batch_size, True)):
         model.zero_grad()
         X = torch.unsqueeze(X,dim=1)
         X = X.transpose(2,3)
@@ -69,10 +68,11 @@ def train(data, X, Y, model, criterion, optim, batch_size):
         num_sub = int(args.num_nodes / args.num_split)
 
         for j in range(args.num_split):
-            if j != args.num_split - 1:
-                id = perm[j * num_sub:(j + 1) * num_sub]
-            else:
-                id = perm[j * num_sub:]
+            id = (
+                perm[j * num_sub : (j + 1) * num_sub]
+                if j != args.num_split - 1
+                else perm[j * num_sub :]
+            )
             id = torch.tensor(id).to(device)
             tx = X[:, :, id, :]
             ty = Y[:, id]
@@ -88,7 +88,6 @@ def train(data, X, Y, model, criterion, optim, batch_size):
 
         if iter%100==0:
             print('iter:{:3d} | loss: {:.3f}'.format(iter,loss.item()/(output.size(0) * data.m)))
-        iter += 1
     return total_loss / n_samples
 
 
@@ -154,7 +153,7 @@ def main():
 
     print(args)
     print('The recpetive field size is', model.receptive_field)
-    nParams = sum([p.nelement() for p in model.parameters()])
+    nParams = sum(p.nelement() for p in model.parameters())
     print('Number of model parameters is', nParams, flush=True)
 
     if args.L1Loss:
@@ -214,7 +213,7 @@ if __name__ == "__main__":
     acc = []
     rae = []
     corr = []
-    for i in range(10):
+    for _ in range(10):
         val_acc, val_rae, val_corr, test_acc, test_rae, test_corr = main()
         vacc.append(val_acc)
         vrae.append(val_rae)

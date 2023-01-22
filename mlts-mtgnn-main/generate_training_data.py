@@ -95,7 +95,7 @@ def generate_train_val_test(args):
         _x, _y = locals()["x_" + cat], locals()["y_" + cat]
         print(cat, "x: ", _x.shape, "y:", _y.shape)
         np.savez_compressed(
-            os.path.join(args.output_dir, "%s.npz" % cat),
+            os.path.join(args.output_dir, f"{cat}.npz"),
             x=_x,
             y=_y,
             x_offsets=x_offsets.reshape(list(x_offsets.shape) + [1]),
